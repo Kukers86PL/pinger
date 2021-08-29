@@ -43,6 +43,7 @@ namespace pinger
         {
             String line = "";
             System.IO.StreamReader file = new System.IO.StreamReader("config.txt");
+            addresses.Clear();
             while ((line = file.ReadLine()) != null)
             {
                 Address_status temp;
@@ -87,6 +88,7 @@ namespace pinger
             StreamWriter file = new StreamWriter("results.txt", true);
             for (int i = 0; i < addresses.Count(); i++)
             {
+                line += addresses[i].ip + ";";
                 if (addresses[i].isOnline)
                 {
                     line += "1;";
@@ -104,10 +106,11 @@ namespace pinger
         {
             while (isRunning)
             {
+                read_config();
                 check_status();
                 store_data();
-                Thread.Sleep(60000);
                 Invalidate();
+                Thread.Sleep(1000);
             }            
         }
 
