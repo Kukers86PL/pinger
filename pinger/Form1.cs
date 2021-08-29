@@ -27,6 +27,18 @@ namespace pinger
 
         private Boolean isRunning = true;
 
+        void init()
+        {
+            if (File.Exists("config.txt") == false)
+            {
+                File.Create("config.txt").Close();
+            }
+            if (File.Exists("results.txt") == false)
+            {
+                File.Create("results.txt").Close();
+            }
+        }
+
         void read_config()
         {
             String line = "";
@@ -97,6 +109,7 @@ namespace pinger
         {
             InitializeComponent();
 
+            init();
             read_config();
             check_status();
             store_data();
