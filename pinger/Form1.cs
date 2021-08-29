@@ -58,15 +58,21 @@ namespace pinger
             for (int i = 0; i < addresses.Count(); i++)
             {
                 Address_status temp = addresses[i];
-
-                Ping pingSender = new Ping();
-                PingReply reply = pingSender.Send(temp.ip);
-
-                if (reply.Status == IPStatus.Success)
+                try
                 {
-                    temp.isOnline = true;
+                    Ping pingSender = new Ping();
+                    PingReply reply = pingSender.Send(temp.ip);
+
+                    if (reply.Status == IPStatus.Success)
+                    {
+                        temp.isOnline = true;
+                    }
+                    else
+                    {
+                        temp.isOnline = false;
+                    }
                 }
-                else
+                catch (IOException)
                 {
                     temp.isOnline = false;
                 }
