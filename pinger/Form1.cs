@@ -16,6 +16,7 @@ namespace pinger
     public partial class Form1 : Form
     {
         private int DOT_SIZE = 300;
+        private int INTERVAL = 1000;
 
         struct Address_status
         {
@@ -45,22 +46,26 @@ namespace pinger
             String line = "";
             System.IO.StreamReader file = new System.IO.StreamReader("config.txt");
             addresses.Clear();
-            bool first = true;
+            int count = 0;
             while ((line = file.ReadLine()) != null)
             {
-                if (first)
+                count++;
+                switch (count)
                 {
-                    DOT_SIZE = Int32.Parse(line);
-                    first = false;
-                }
-                else
-                {
-                    String[] subs = line.Split(';');
-                    Address_status temp;
-                    temp.label = subs[0];
-                    temp.ip = subs[1];
-                    temp.isOnline = false;
-                    addresses.Add(temp);
+                    case 1:
+                        DOT_SIZE = Int32.Parse(line);
+                        break;
+                    case 2:
+                        INTERVAL = Int32.Parse(line);
+                        break;
+                    default:
+                        String[] subs = line.Split(';');
+                        Address_status temp;
+                        temp.label = subs[0];
+                        temp.ip = subs[1];
+                        temp.isOnline = false;
+                        addresses.Add(temp);
+                    break;
                 }
             }
             file.Close();
@@ -121,8 +126,10 @@ namespace pinger
                 read_config();
                 check_status();
                 store_data();
+
                 Invalidate();
-                Thread.Sleep(1000);
+
+                Thread.Sleep(INTERVAL);
             }            
         }
 
