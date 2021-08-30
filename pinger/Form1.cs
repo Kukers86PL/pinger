@@ -21,6 +21,7 @@ namespace pinger
         {
             public String ip;
             public Boolean isOnline;
+            public String label;
         }
 
         private List<Address_status> addresses = new List<Address_status>();
@@ -44,12 +45,23 @@ namespace pinger
             String line = "";
             System.IO.StreamReader file = new System.IO.StreamReader("config.txt");
             addresses.Clear();
+            bool first = true;
             while ((line = file.ReadLine()) != null)
             {
-                Address_status temp;
-                temp.ip = line;
-                temp.isOnline = false;
-                addresses.Add(temp);
+                if (first)
+                {
+                    DOT_SIZE = Int32.Parse(line);
+                    first = false;
+                }
+                else
+                {
+                    String[] subs = line.Split(';');
+                    Address_status temp;
+                    temp.label = subs[0];
+                    temp.ip = subs[1];
+                    temp.isOnline = false;
+                    addresses.Add(temp);
+                }
             }
             file.Close();
         }
@@ -119,6 +131,7 @@ namespace pinger
             InitializeComponent();
 
             init();
+
             read_config();
             check_status();
             store_data();
@@ -143,6 +156,14 @@ namespace pinger
                 {
                     e.Graphics.FillEllipse(redBrush, i * DOT_SIZE, 0, DOT_SIZE, DOT_SIZE);
                 }
+
+                Font drawFont = new Font("Arial", 30);
+                SolidBrush drawBrush = new SolidBrush(Color.Black);
+
+                StringFormat drawFormat = new StringFormat();
+                drawFormat.Alignment = StringAlignment.Center;
+
+                e.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, i * DOT_SIZE + DOT_SIZE / 2, DOT_SIZE / 2 - 20, drawFormat);
             }
         }
 
