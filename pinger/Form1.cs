@@ -112,7 +112,7 @@ namespace pinger
                         temp.isOnline = false;
                     }
                 }
-                catch (IOException)
+                catch
                 {
                     temp.isOnline = false;
                 }
@@ -146,7 +146,7 @@ namespace pinger
             int count = 0;
             while (isRunning)
             {
-                if (count > INTERVAL)
+                if (count >= INTERVAL)
                 {
                     count = 0;
 
