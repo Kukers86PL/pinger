@@ -142,7 +142,7 @@ namespace pinger
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            this.Width = (DOT_SIZE + 20) * addresses.Count();
+            this.Width = (DOT_SIZE + 5) * addresses.Count();
             this.Height = (DOT_SIZE + 40);
             SolidBrush redBrush = new SolidBrush(Color.Red);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
@@ -157,13 +157,13 @@ namespace pinger
                     e.Graphics.FillEllipse(redBrush, i * DOT_SIZE, 0, DOT_SIZE, DOT_SIZE);
                 }
 
-                Font drawFont = new Font("Arial", 30);
+                Font drawFont = new Font("Arial", DOT_SIZE / 10);
                 SolidBrush drawBrush = new SolidBrush(Color.Black);
 
                 StringFormat drawFormat = new StringFormat();
                 drawFormat.Alignment = StringAlignment.Center;
 
-                e.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, i * DOT_SIZE + DOT_SIZE / 2, DOT_SIZE / 2 - 20, drawFormat);
+                e.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, i * DOT_SIZE + DOT_SIZE / 2, DOT_SIZE / 2 - DOT_SIZE / 10, drawFormat);
             }
         }
 
