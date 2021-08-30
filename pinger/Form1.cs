@@ -140,8 +140,6 @@ namespace pinger
             init();
 
             read_config();
-            check_status();
-            store_data();
 
             Thread t = new Thread(run);
             t.Start();
