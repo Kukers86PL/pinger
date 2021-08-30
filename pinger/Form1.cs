@@ -17,6 +17,8 @@ namespace pinger
     {
         private int DOT_SIZE = 300;
         private int INTERVAL = 1000;
+        private String CONFIG_FILE = "config.txt";
+        private String RESULTS_FILE = "results.txt";
 
         struct Address_status
         {
@@ -31,24 +33,41 @@ namespace pinger
 
         void init()
         {
-            if (File.Exists("config.txt") == false)
+            if (File.Exists(CONFIG_FILE) == false)
             {
-                File.Create("config.txt").Close();
+                File.Create(CONFIG_FILE).Close();
+
+                StreamWriter file = new StreamWriter(CONFIG_FILE, false);
+                file.WriteLine("# Dot size in pixels:");
+                file.WriteLine("200");
+                file.WriteLine("# Check interval in miliseconds:");
+                file.WriteLine("60000");
+                file.WriteLine("# [Host label];[Host to ping]:");
+                file.WriteLine("Google;www.google.com");
+                file.Close();
             }
-            if (File.Exists("results.txt") == false)
+            if (File.Exists(RESULTS_FILE) == false)
             {
-                File.Create("results.txt").Close();
+                File.Create(RESULTS_FILE).Close();
             }
         }
 
         void read_config()
         {
             String line = "";
-            System.IO.StreamReader file = new System.IO.StreamReader("config.txt");
+            System.IO.StreamReader file = new System.IO.StreamReader(CONFIG_FILE);
             addresses.Clear();
             int count = 0;
             while ((line = file.ReadLine()) != null)
             {
+                if (line.Count() == 0)
+                {
+                    continue;
+                }
+                if (line[0] == '#')
+                {
+                    continue;
+                }
                 count++;
                 switch (count)
                 {
@@ -60,11 +79,14 @@ namespace pinger
                         break;
                     default:
                         String[] subs = line.Split(';');
-                        Address_status temp;
-                        temp.label = subs[0];
-                        temp.ip = subs[1];
-                        temp.isOnline = false;
-                        addresses.Add(temp);
+                        if (subs.Length == 2)
+                        {
+                            Address_status temp;
+                            temp.label = subs[0];
+                            temp.ip = subs[1];
+                            temp.isOnline = false;
+                            addresses.Add(temp);
+                        }
                     break;
                 }
             }
@@ -102,7 +124,7 @@ namespace pinger
         void store_data()
         {
             String line = DateTime.Now.ToString() + ";";
-            StreamWriter file = new StreamWriter("results.txt", true);
+            StreamWriter file = new StreamWriter(RESULTS_FILE, true);
             for (int i = 0; i < addresses.Count(); i++)
             {
                 line += addresses[i].ip + ";";
@@ -121,15 +143,22 @@ namespace pinger
 
         void run()
         {
+            int count = 0;
             while (isRunning)
             {
-                read_config();
-                check_status();
-                store_data();
+                if ((count % INTERVAL) == 0)
+                {
+                    count = 0;
 
-                Invalidate();
+                    read_config();
+                    check_status();
+                    store_data();
 
-                Thread.Sleep(INTERVAL);
+                    Invalidate();
+                }
+
+                Thread.Sleep(1);
+                count += 1;
             }            
         }
 
@@ -147,7 +176,7 @@ namespace pinger
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            this.Width = (DOT_SIZE + 5) * addresses.Count();
+            this.Width = (DOT_SIZE + 20) * addresses.Count();
             this.Height = (DOT_SIZE + 40);
             SolidBrush redBrush = new SolidBrush(Color.Red);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
