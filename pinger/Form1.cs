@@ -41,7 +41,7 @@ namespace pinger
                 file.WriteLine("# Dot size in pixels:");
                 file.WriteLine("200");
                 file.WriteLine("# Check interval in miliseconds:");
-                file.WriteLine("60000");
+                file.WriteLine("1000");
                 file.WriteLine("# [Host label];[Host to ping]:");
                 file.WriteLine("Google;www.google.com");
                 file.Close();
@@ -146,7 +146,7 @@ namespace pinger
             int count = 0;
             while (isRunning)
             {
-                if ((count % INTERVAL) == 0)
+                if (count > INTERVAL)
                 {
                     count = 0;
 
@@ -158,7 +158,7 @@ namespace pinger
                 }
 
                 Thread.Sleep(1);
-                count += 1;
+                count++;
             }            
         }
 
