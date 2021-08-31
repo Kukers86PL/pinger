@@ -42,8 +42,9 @@ namespace pinger
                 file.WriteLine("200");
                 file.WriteLine("# Check interval in miliseconds:");
                 file.WriteLine("1000");
-                file.WriteLine("# [Host label];[Host to ping]:");
+                file.WriteLine("# [Host label];[Host to ping [IP or name]]:");
                 file.WriteLine("Google;www.google.com");
+                file.WriteLine("# etc...");
                 file.Close();
             }
             if (File.Exists(RESULTS_FILE) == false)
@@ -176,19 +177,22 @@ namespace pinger
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            this.Width = (DOT_SIZE + 20) * addresses.Count();
-            this.Height = (DOT_SIZE + 40);
             SolidBrush redBrush = new SolidBrush(Color.Red);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
+            int columns = Math.Max(this.Width / DOT_SIZE, 1);
+            int rows = Math.Max(this.Height / DOT_SIZE, 1);
             for (int i = 0; i < addresses.Count(); i++)
             {
+                int x = (i % columns) * DOT_SIZE;
+                int y = ((i / columns) % rows) * DOT_SIZE;
+
                 if (addresses[i].isOnline)
                 {
-                    e.Graphics.FillEllipse(greenBrush, i * DOT_SIZE, 0, DOT_SIZE, DOT_SIZE);
+                    e.Graphics.FillEllipse(greenBrush, x, y, DOT_SIZE, DOT_SIZE);
                 }
                 else
                 {
-                    e.Graphics.FillEllipse(redBrush, i * DOT_SIZE, 0, DOT_SIZE, DOT_SIZE);
+                    e.Graphics.FillEllipse(redBrush, x, y, DOT_SIZE, DOT_SIZE);
                 }
 
                 Font drawFont = new Font("Arial", DOT_SIZE / 10);
@@ -197,13 +201,18 @@ namespace pinger
                 StringFormat drawFormat = new StringFormat();
                 drawFormat.Alignment = StringAlignment.Center;
 
-                e.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, i * DOT_SIZE + DOT_SIZE / 2, DOT_SIZE / 2 - DOT_SIZE / 10, drawFormat);
+                e.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, x + DOT_SIZE / 2, y + DOT_SIZE / 2 - DOT_SIZE / 10, drawFormat);
             }
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             isRunning = false;
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            Invalidate();
         }
     }
 }
