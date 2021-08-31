@@ -95,32 +95,35 @@ namespace pinger
             file.Close();
         }
 
+        void check_thread(Object i)
+        {
+            Address_status temp = addresses[(int)i];
+            try
+            {
+                Ping pingSender = new Ping();
+                PingReply reply = pingSender.Send(temp.ip);
+                temp.isOnline = (reply.Status == IPStatus.Success);
+            }
+            catch
+            {
+                temp.isOnline =  false;
+            }
+            addresses[(int)i] = temp;
+        }
+
         void check_status()
         {
             last_check_date = DateTime.Now.ToString();
+            List<Thread> threads = new List<Thread>();
             for (int i = 0; i < addresses.Count(); i++)
             {
-                Address_status temp = addresses[i];
-                try
-                {
-                    Ping pingSender = new Ping();
-                    PingReply reply = pingSender.Send(temp.ip);
-
-                    if (reply.Status == IPStatus.Success)
-                    {
-                        temp.isOnline = true;
-                    }
-                    else
-                    {
-                        temp.isOnline = false;
-                    }
-                }
-                catch
-                {
-                    temp.isOnline = false;
-                }
-
-                addresses[i] = temp;
+                Thread temp = new Thread(new ParameterizedThreadStart(check_thread));
+                temp.Start(i);
+                threads.Add(temp);
+            }
+            for (int i = 0; i < threads.Count(); i++)
+            {
+                threads[i].Join();
             }
         }
 
