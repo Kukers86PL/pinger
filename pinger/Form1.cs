@@ -42,7 +42,7 @@ namespace pinger
                 file.WriteLine("200");
                 file.WriteLine("# Check interval in miliseconds:");
                 file.WriteLine("1000");
-                file.WriteLine("# [Host label];[Host to ping [IP or name]]:");
+                file.WriteLine("# [Host label];[Host to ping [IPv4/IPv6/Name]]:");
                 file.WriteLine("Google;www.google.com");
                 file.WriteLine("# etc...");
                 file.Close();
