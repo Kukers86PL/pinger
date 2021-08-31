@@ -177,6 +177,7 @@ namespace pinger
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            this.Text = "Pinger v1.0: Last status update: " + DateTime.Now.ToString();
             SolidBrush redBrush = new SolidBrush(Color.Red);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
             int columns = Math.Max(this.Width / DOT_SIZE, 1);
