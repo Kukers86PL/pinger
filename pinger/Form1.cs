@@ -19,6 +19,7 @@ namespace pinger
         private int INTERVAL = 1000;
         private String CONFIG_FILE = "config.txt";
         private String RESULTS_FILE = "results.txt";
+        private String last_check_date = "";
 
         struct Address_status
         {
@@ -96,6 +97,7 @@ namespace pinger
 
         void check_status()
         {
+            last_check_date = DateTime.Now.ToString();
             for (int i = 0; i < addresses.Count(); i++)
             {
                 Address_status temp = addresses[i];
@@ -124,7 +126,7 @@ namespace pinger
 
         void store_data()
         {
-            String line = DateTime.Now.ToString() + ";";
+            String line = last_check_date + ";";
             StreamWriter file = new StreamWriter(RESULTS_FILE, true);
             for (int i = 0; i < addresses.Count(); i++)
             {
@@ -144,7 +146,7 @@ namespace pinger
 
         void run()
         {
-            int count = 0;
+            int count = INTERVAL;
             while (isRunning)
             {
                 if (count >= INTERVAL)
@@ -169,15 +171,13 @@ namespace pinger
 
             init();
 
-            read_config();
-
             Thread t = new Thread(run);
             t.Start();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            this.Text = "Pinger v1.0: Last status update: " + DateTime.Now.ToString();
+            this.Text = "Pinger v1.0: Last check date: " + last_check_date;
             SolidBrush redBrush = new SolidBrush(Color.Red);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
             int columns = Math.Max(this.Width / DOT_SIZE, 1);
