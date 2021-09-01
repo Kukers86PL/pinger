@@ -20,6 +20,7 @@ namespace pinger
         private String CONFIG_FILE = "config.txt";
         private String RESULTS_FILE = "results.txt";
         private String last_check_date = "";
+        private String VERSION = "v1.1";
 
         struct Address_status
         {
@@ -32,21 +33,27 @@ namespace pinger
 
         private Boolean isRunning = true;
 
+        void init_config()
+        {
+            StreamWriter file = new StreamWriter(CONFIG_FILE, false);
+            file.WriteLine(VERSION);
+            file.WriteLine("# Check interval in miliseconds:");
+            file.WriteLine("1000");
+            file.WriteLine("# [Host label];[Host to ping [IPv4/IPv6/Name]]:");
+            file.WriteLine("Google;www.google.com");
+            file.WriteLine("Facebook;www.facebook.com");
+            file.WriteLine("Microsoft;www.microsoft.com");
+            file.WriteLine("# etc...");
+            file.Close();
+        }
+
         void init()
         {
             if (File.Exists(CONFIG_FILE) == false)
             {
                 File.Create(CONFIG_FILE).Close();
 
-                StreamWriter file = new StreamWriter(CONFIG_FILE, false);
-                file.WriteLine("# Check interval in miliseconds:");
-                file.WriteLine("1000");
-                file.WriteLine("# [Host label];[Host to ping [IPv4/IPv6/Name]]:");
-                file.WriteLine("Google;www.google.com");
-                file.WriteLine("Facebook;www.facebook.com");
-                file.WriteLine("Microsoft;www.microsoft.com");
-                file.WriteLine("# etc...");
-                file.Close();
+                init_config();
             }
             if (File.Exists(RESULTS_FILE) == false)
             {
@@ -74,6 +81,16 @@ namespace pinger
                 switch (count)
                 {
                     case 1:
+                        if (VERSION != line)
+                        {
+                            file.Close();
+                            init_config();
+                            MessageBox.Show("Incompatible config file version. Config was reseted. Please rerun application.","Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                            Application.Exit();
+                            return;
+                        }
+                        break;
+                    case 2:
                         INTERVAL = Int32.Parse(line);
                         break;
                     default:
@@ -177,7 +194,8 @@ namespace pinger
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            DOT_SIZE = Math.Max(Math.Max(this.Width / addresses.Count(), this.Height / addresses.Count()) - 20, 200);
+            int number_of_dots = Math.Max(addresses.Count(), 1);
+            DOT_SIZE = Math.Max(Math.Max(this.Width / number_of_dots, this.Height / number_of_dots) - 20, 200);
             this.Text = "Pinger v1.0: Last check date: " + last_check_date;
             SolidBrush redBrush = new SolidBrush(Color.Red);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
