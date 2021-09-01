@@ -1,4 +1,4 @@
-# Pinger v1.0
+# Pinger v1.1
 #
 # Pinger is tool to monitor network connectivity.
 # It does what is says. It takes host info to ping from
