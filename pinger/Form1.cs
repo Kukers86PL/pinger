@@ -15,7 +15,7 @@ namespace pinger
 {
     public partial class Form1 : Form
     {
-        private int DOT_SIZE = 300;
+        private int DOT_SIZE = 200;
         private int INTERVAL = 1000;
         private String CONFIG_FILE = "config.txt";
         private String RESULTS_FILE = "results.txt";
@@ -39,12 +39,12 @@ namespace pinger
                 File.Create(CONFIG_FILE).Close();
 
                 StreamWriter file = new StreamWriter(CONFIG_FILE, false);
-                file.WriteLine("# Dot size in pixels:");
-                file.WriteLine("200");
                 file.WriteLine("# Check interval in miliseconds:");
                 file.WriteLine("1000");
                 file.WriteLine("# [Host label];[Host to ping [IPv4/IPv6/Name]]:");
                 file.WriteLine("Google;www.google.com");
+                file.WriteLine("Facebook;www.facebook.com");
+                file.WriteLine("Microsoft;www.microsoft.com");
                 file.WriteLine("# etc...");
                 file.Close();
             }
@@ -74,9 +74,6 @@ namespace pinger
                 switch (count)
                 {
                     case 1:
-                        DOT_SIZE = Int32.Parse(line);
-                        break;
-                    case 2:
                         INTERVAL = Int32.Parse(line);
                         break;
                     default:
@@ -180,6 +177,7 @@ namespace pinger
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            DOT_SIZE = Math.Max(Math.Max(this.Width / addresses.Count(), this.Height / addresses.Count()) - 20, 200);
             this.Text = "Pinger v1.0: Last check date: " + last_check_date;
             SolidBrush redBrush = new SolidBrush(Color.Red);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
