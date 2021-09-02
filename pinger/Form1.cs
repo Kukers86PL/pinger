@@ -29,6 +29,7 @@ namespace pinger
             public String ip;
             public Boolean isOnline;
             public String label;
+            public long response_time;
         }
 
         private List<Address_status> addresses = new List<Address_status>();
@@ -103,6 +104,7 @@ namespace pinger
                             temp.label = subs[0];
                             temp.ip = subs[1];
                             temp.isOnline = false;
+                            temp.response_time = -1;
                             addresses.Add(temp);
                         }
                     break;
@@ -118,7 +120,16 @@ namespace pinger
             {
                 Ping pingSender = new Ping();
                 PingReply reply = pingSender.Send(temp.ip);
-                temp.isOnline = (reply.Status == IPStatus.Success);
+                if (reply.Status == IPStatus.Success)
+                {
+                    temp.isOnline = true;
+                    temp.response_time = reply.RoundtripTime;
+                }
+                else
+                {
+                    temp.isOnline = false;
+                    temp.response_time = -1;
+                }
             }
             catch
             {
@@ -152,11 +163,11 @@ namespace pinger
                 line += addresses[i].ip + ";";
                 if (addresses[i].isOnline)
                 {
-                    line += "1;";
+                    line += addresses[i].response_time.ToString() + ";";
                 }
                 else
                 {
-                    line += "0;";
+                    line += "-1;";
                 }
             }
             file.WriteLine(line);
@@ -231,7 +242,9 @@ namespace pinger
                 StringFormat drawFormat = new StringFormat();
                 drawFormat.Alignment = StringAlignment.Center;
 
-                grafx.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, x + DOT_SIZE / 2, y + DOT_SIZE / 2 - DOT_SIZE / 10, drawFormat);
+                string label = addresses[i].label + "\n" + addresses[i].response_time.ToString() + " ms";
+
+                grafx.Graphics.DrawString(label, drawFont, drawBrush, x + DOT_SIZE / 2, y + DOT_SIZE / 2 - DOT_SIZE / 10, drawFormat);
             }
             grafx.Render(e.Graphics);
         }
