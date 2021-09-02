@@ -21,6 +21,8 @@ namespace pinger
         private String RESULTS_FILE = "results.txt";
         private String last_check_date = "";
         private String VERSION = "v1.1";
+        private BufferedGraphicsContext context;
+        private BufferedGraphics grafx;
 
         struct Address_status
         {
@@ -188,12 +190,20 @@ namespace pinger
 
             init();
 
+            context = BufferedGraphicsManager.Current;
+            context.MaximumBuffer = new Size(this.Width + 1, this.Height + 1);
+            grafx = context.Allocate(this.CreateGraphics(), new Rectangle(0, 0, this.Width, this.Height));
+
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
+
             Thread t = new Thread(run);
             t.Start();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            grafx.Graphics.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
             int number_of_dots = Math.Max(addresses.Count(), 1);
             DOT_SIZE = Math.Max(Math.Max(this.Width / number_of_dots, this.Height / number_of_dots) - 20, 200);
             this.Text = "Pinger v1.0: Last check date: " + last_check_date;
@@ -208,11 +218,11 @@ namespace pinger
 
                 if (addresses[i].isOnline)
                 {
-                    e.Graphics.FillEllipse(greenBrush, x, y, DOT_SIZE, DOT_SIZE);
+                    grafx.Graphics.FillEllipse(greenBrush, x, y, DOT_SIZE, DOT_SIZE);
                 }
                 else
                 {
-                    e.Graphics.FillEllipse(redBrush, x, y, DOT_SIZE, DOT_SIZE);
+                    grafx.Graphics.FillEllipse(redBrush, x, y, DOT_SIZE, DOT_SIZE);
                 }
 
                 Font drawFont = new Font("Arial", DOT_SIZE / 10);
@@ -221,8 +231,9 @@ namespace pinger
                 StringFormat drawFormat = new StringFormat();
                 drawFormat.Alignment = StringAlignment.Center;
 
-                e.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, x + DOT_SIZE / 2, y + DOT_SIZE / 2 - DOT_SIZE / 10, drawFormat);
+                grafx.Graphics.DrawString(addresses[i].label, drawFont, drawBrush, x + DOT_SIZE / 2, y + DOT_SIZE / 2 - DOT_SIZE / 10, drawFormat);
             }
+            grafx.Render(e.Graphics);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -232,6 +243,14 @@ namespace pinger
 
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
+            context.MaximumBuffer = new Size(this.Width + 1, this.Height + 1);
+            if (grafx != null)
+            {
+                grafx.Dispose();
+                grafx = null;
+            }
+            grafx = context.Allocate(this.CreateGraphics(), new Rectangle(0, 0, this.Width, this.Height));
+
             Invalidate();
         }
     }
