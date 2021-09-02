@@ -37,7 +37,7 @@ namespace pinger
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Name = "Form1";
-            this.Text = "Pinger v1.0";
+            this.Text = "Pinger v1.4";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);

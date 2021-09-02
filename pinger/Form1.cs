@@ -17,16 +17,17 @@ namespace pinger
     {
         private int DOT_SIZE = 200;
         private int INTERVAL = 1000;
+        private Char SEPAROTOR = ';';
         private String CONFIG_FILE = "config.txt";
         private String RESULTS_FILE = "results.txt";
         private String last_check_date = "";
-        private String VERSION = "v1.1";
+        private String VERSION = "v1.4";
         private BufferedGraphicsContext context;
         private BufferedGraphics grafx;
 
         struct Address_status
         {
-            public String ip;
+            public String host;
             public Boolean isOnline;
             public String label;
             public long response_time;
@@ -44,8 +45,8 @@ namespace pinger
             file.WriteLine("1000");
             file.WriteLine("# [Host label];[Host to ping [IPv4/IPv6/Name]]:");
             file.WriteLine("Google;www.google.com");
-            file.WriteLine("Facebook;www.facebook.com");
-            file.WriteLine("Microsoft;www.microsoft.com");
+            file.WriteLine("DNS IPv4;8.8.8.8");
+            file.WriteLine("DNS IPv6;2001:4860:4860::8888");
             file.WriteLine("# etc...");
             file.Close();
         }
@@ -97,12 +98,12 @@ namespace pinger
                         INTERVAL = Int32.Parse(line);
                         break;
                     default:
-                        String[] subs = line.Split(';');
+                        String[] subs = line.Split(SEPAROTOR);
                         if (subs.Length == 2)
                         {
                             Address_status temp;
                             temp.label = subs[0];
-                            temp.ip = subs[1];
+                            temp.host = subs[1];
                             temp.isOnline = false;
                             temp.response_time = -1;
                             addresses.Add(temp);
@@ -119,7 +120,7 @@ namespace pinger
             try
             {
                 Ping pingSender = new Ping();
-                PingReply reply = pingSender.Send(temp.ip);
+                PingReply reply = pingSender.Send(temp.host);
                 if (reply.Status == IPStatus.Success)
                 {
                     temp.isOnline = true;
@@ -156,14 +157,14 @@ namespace pinger
 
         void store_data()
         {
-            String line = last_check_date + ";";
+            String line = last_check_date + SEPAROTOR;
             StreamWriter file = new StreamWriter(RESULTS_FILE, true);
             for (int i = 0; i < addresses.Count(); i++)
             {
-                line += addresses[i].ip + ";";
+                line += addresses[i].label + SEPAROTOR + addresses[i].host + SEPAROTOR;
                 if (addresses[i].isOnline)
                 {
-                    line += addresses[i].response_time.ToString() + ";";
+                    line += addresses[i].response_time.ToString() + SEPAROTOR;
                 }
                 else
                 {
